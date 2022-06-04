@@ -39,9 +39,14 @@ public class ProdutoController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-	@GetMapping("/genero/{genero}")
-	public ResponseEntity<List<Produto>> getByGenero(@PathVariable String genero) {
-		return ResponseEntity.ok(produtoRepository.findAllByGeneroContainingIgnoreCase(genero));
+	@GetMapping("/titulo/{titulo}")
+	public ResponseEntity<List<Produto>> getByTitulo(@PathVariable String titulo) {
+		return ResponseEntity.ok(produtoRepository.findAllByPlataformaContainingIgnoreCase(titulo));
+	}
+	
+	@GetMapping("/plataforma/{plataforma}")
+	public ResponseEntity<List<Produto>> getByplataforma(@PathVariable String plataforma) {
+		return ResponseEntity.ok(produtoRepository.findAllByPlataformaContainingIgnoreCase(plataforma));
 	}
 	
 	@GetMapping("/precomenorque/{preco}")

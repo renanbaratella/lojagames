@@ -32,7 +32,7 @@ public class Produto {
 
 	private Integer qtd;
 
-	private String genero;
+	private String plataforma;
 
 	private LocalDate data_lancamento;
 
@@ -88,12 +88,12 @@ public class Produto {
 		this.qtd = qtd;
 	}
 
-	public String getGenero() {
-		return genero;
+	public String getPlataforma() {
+		return plataforma;
 	}
 
-	public void setGenero(String genero) {
-		this.genero = genero;
+	public void setPlataforma(String plataforma) {
+		this.plataforma = plataforma;
 	}
 
 	public LocalDate getData_lancamento() {
@@ -142,6 +142,14 @@ public class Produto {
 
 	public void setCategoria(Categoria categoria) {
 		this.categoria = categoria;
+	}
+
+	@Override
+	public String toString() {
+		return "Produto [id=" + id + ", titulo=" + titulo + ", descricao=" + descricao + ", preco=" + preco + ", qtd="
+				+ qtd + ", plataforma=" + plataforma + ", data_lancamento=" + data_lancamento
+				+ ", classificacao_indicativa=" + classificacao_indicativa + ", espaco_hd=" + espaco_hd + ", disp="
+				+ disp + ", foto=" + foto + ", categoria=" + categoria + "]";
 	}
 
 }

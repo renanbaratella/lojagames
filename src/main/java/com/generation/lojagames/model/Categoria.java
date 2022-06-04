@@ -16,15 +16,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "tb_categorias")
+
 public class Categoria {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	@JsonIgnoreProperties("categoria")
 	@NotNull(message = "O atributo é obrigatório")
 	@NotBlank(message = "O atributo não deve conter espaços em branco")
-	private String plataforma;
+	private String tipo;
 
 	@OneToMany(mappedBy = "categoria", cascade = CascadeType.REMOVE)
 	@JsonIgnoreProperties("categoria")
@@ -38,12 +39,12 @@ public class Categoria {
 		this.id = id;
 	}
 
-	public String getPlataforma() {
-		return plataforma;
+	public String getTipo() {
+		return tipo;
 	}
 
-	public void setPlataforma(String plataforma) {
-		this.plataforma = plataforma;
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
 	}
 
 	public List<Produto> getProduto() {
@@ -52,6 +53,11 @@ public class Categoria {
 
 	public void setProduto(List<Produto> produto) {
 		this.produto = produto;
+	}
+
+	@Override
+	public String toString() {
+		return "Categoria [id=" + id + ", tipo=" + tipo + ", produto=" + produto + "]";
 	}
 
 }

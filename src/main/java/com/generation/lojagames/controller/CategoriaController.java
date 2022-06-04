@@ -39,18 +39,18 @@ public class CategoriaController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-	@GetMapping("/plataforma/{plataforma}")
-	public ResponseEntity<List<Categoria>> getByPlataforma(@PathVariable String plataforma) {
-		if (!categoriaRepository.findAllByPlataformaContainingIgnoreCase(plataforma).isEmpty())
-			return ResponseEntity.ok(categoriaRepository.findAllByPlataformaContainingIgnoreCase(plataforma));
+	@GetMapping("/tipo/{tipo}")
+	public ResponseEntity<List<Categoria>> getBytipo(@PathVariable String tipo) {
+		if (!categoriaRepository.findAllByTipoContainingIgnoreCase(tipo).isEmpty())
+			return ResponseEntity.ok(categoriaRepository.findAllByTipoContainingIgnoreCase(tipo));
 		return ResponseEntity.notFound().build();
 	}
-	
-	@GetMapping("/plataforma_start/{plataforma}")
-	public ResponseEntity<List<Categoria>> getByNomeStart(@PathVariable String plataforma){
-		return ResponseEntity.ok(categoriaRepository.findAllByPlataformaStartingWith(plataforma));
+
+	@GetMapping("/tipo_start/{tipo}")
+	public ResponseEntity<List<Categoria>> getByNomeStart(@PathVariable String tipo) {
+		return ResponseEntity.ok(categoriaRepository.findAllByTipoStartingWith(tipo));
 	}
-	
+
 	@PostMapping
 	public ResponseEntity<Categoria> postCategoria(@Valid @RequestBody Categoria categoria) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaRepository.save(categoria));
@@ -67,6 +67,7 @@ public class CategoriaController {
 	public ResponseEntity<?> deleteById(@PathVariable Long id) {
 		return categoriaRepository.findById(id).map(resposta -> {
 			categoriaRepository.deleteById(id);
+			System.out.println(resposta.toString());
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 		}).orElse(ResponseEntity.notFound().build());
 	}

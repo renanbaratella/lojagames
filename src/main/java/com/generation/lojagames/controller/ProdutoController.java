@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.generation.lojagames.model.Produto;
+import com.generation.lojagames.repository.CategoriaRepository;
 import com.generation.lojagames.repository.ProdutoRepository;
 
 @RestController
@@ -27,6 +28,9 @@ public class ProdutoController {
 
 	@Autowired
 	private ProdutoRepository produtoRepository;
+
+	@Autowired
+	private CategoriaRepository categoriaRepository;
 
 	@GetMapping
 	public ResponseEntity<List<Produto>> getAll() {
@@ -39,38 +43,53 @@ public class ProdutoController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
+	//procurar pelo nome do jogo(titulo)
+	
 	@GetMapping("/titulo/{titulo}")
 	public ResponseEntity<List<Produto>> getByTitulo(@PathVariable String titulo) {
 		return ResponseEntity.ok(produtoRepository.findAllByPlataformaContainingIgnoreCase(titulo));
 	}
 	
+	// procurar pela plataforma se é ps4, ps5...
+
 	@GetMapping("/plataforma/{plataforma}")
 	public ResponseEntity<List<Produto>> getByplataforma(@PathVariable String plataforma) {
 		return ResponseEntity.ok(produtoRepository.findAllByPlataformaContainingIgnoreCase(plataforma));
 	}
+
+	// filtar por preco menor que
 	
 	@GetMapping("/precomenorque/{preco}")
-	public ResponseEntity<List<Produto>> findByPrecoMenorQue(@PathVariable Double preco){
+	public ResponseEntity<List<Produto>> findByPrecoMenorQue(@PathVariable Double preco) {
 		return ResponseEntity.ok(produtoRepository.findByPrecoLessThanEqual(preco));
 	}
+
+	
+	// filtar por preco maior que
 	
 	@GetMapping("/precomaiorque/{preco}")
-	public ResponseEntity<List<Produto>> findByPrecoMaiorQue(@PathVariable Double preco){
+	public ResponseEntity<List<Produto>> findByPrecoMaiorQue(@PathVariable Double preco) {
 		return ResponseEntity.ok(produtoRepository.findByPrecoGreaterThanEqual(preco));
 	}
+
+	// filtrar por intervalo de preços
 	
 	@GetMapping("/preco_inicial/{inicio}/preco_final/{fim}")
-	public ResponseEntity<List<Produto>> getByPrecoIntervalo(@PathVariable Double inicio, @PathVariable Double fim){
+	public ResponseEntity<List<Produto>> getByPrecoIntervalo(@PathVariable Double inicio, @PathVariable Double fim) {
 		return ResponseEntity.ok(produtoRepository.findByPrecoBetween(inicio, fim));
 	}
+
+	// verificar produtos disponiveis para compra
 	
 	@GetMapping("/disponiveis")
-	public ResponseEntity<List<Produto>> getByProdutoDisponivel(){
+	public ResponseEntity<List<Produto>> getByProdutoDisponivel() {
 		return ResponseEntity.ok(produtoRepository.findByDispTrue());
 	}
+
+	// ver produtos indisponiveis no momento
 	
 	@GetMapping("/indisponiveis")
-	public ResponseEntity<List<Produto>> getByProdutoIndisponivel(){
+	public ResponseEntity<List<Produto>> getByProdutoIndisponivel() {
 		return ResponseEntity.ok(produtoRepository.findByDispFalse());
 	}
 
@@ -81,9 +100,12 @@ public class ProdutoController {
 
 	@PutMapping
 	public ResponseEntity<Produto> putProduto(@Valid @RequestBody Produto produto) {
-		return produtoRepository.findById(produto.getId())
-				.map(resposta -> ResponseEntity.ok().body(produtoRepository.save(produto)))
-				.orElse(ResponseEntity.notFound().build());
+		if (produtoRepository.existsById(produto.getId())) {
+			return categoriaRepository.findById(produto.getCategoria().getId())
+					.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(produtoRepository.save(produto)))
+					.orElse(ResponseEntity.badRequest().build());
+		}
+		return ResponseEntity.notFound().build();
 	}
 
 	@DeleteMapping("/{id}")

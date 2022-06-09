@@ -2,6 +2,7 @@ package com.generation.lojagames.model;
 
 import java.time.LocalDate;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -44,9 +45,13 @@ public class Produto {
 
 	private String foto;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.REFRESH)
 	@JsonIgnoreProperties("produto")
 	private Categoria categoria;
+
+	@ManyToOne(cascade = CascadeType.REFRESH)
+	@JsonIgnoreProperties("produto")
+	private Usuario usuario;
 
 	public Long getId() {
 		return id;
@@ -144,12 +149,20 @@ public class Produto {
 		this.categoria = categoria;
 	}
 
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
 	@Override
 	public String toString() {
 		return "Produto [id=" + id + ", titulo=" + titulo + ", descricao=" + descricao + ", preco=" + preco + ", qtd="
 				+ qtd + ", plataforma=" + plataforma + ", data_lancamento=" + data_lancamento
 				+ ", classificacao_indicativa=" + classificacao_indicativa + ", espaco_hd=" + espaco_hd + ", disp="
-				+ disp + ", foto=" + foto + ", categoria=" + categoria + "]";
+				+ disp + ", foto=" + foto + ", categoria=" + categoria + ", usuario=" + usuario + "]";
 	}
 
 }

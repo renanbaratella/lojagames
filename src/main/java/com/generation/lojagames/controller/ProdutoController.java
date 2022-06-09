@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.generation.lojagames.model.Produto;
 import com.generation.lojagames.repository.CategoriaRepository;
 import com.generation.lojagames.repository.ProdutoRepository;
+import com.generation.lojagames.repository.UsuarioRepository;
 
 @RestController
 @RequestMapping("/produtos")
@@ -32,6 +34,9 @@ public class ProdutoController {
 	@Autowired
 	private CategoriaRepository categoriaRepository;
 
+	@Autowired
+	private UsuarioRepository usuarioRepository;
+
 	@GetMapping
 	public ResponseEntity<List<Produto>> getAll() {
 		return ResponseEntity.ok(produtoRepository.findAll());
@@ -43,13 +48,13 @@ public class ProdutoController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 
-	//procurar pelo nome do jogo(titulo)
-	
+	// procurar pelo nome do jogo(titulo)
+
 	@GetMapping("/titulo/{titulo}")
 	public ResponseEntity<List<Produto>> getByTitulo(@PathVariable String titulo) {
 		return ResponseEntity.ok(produtoRepository.findAllByPlataformaContainingIgnoreCase(titulo));
 	}
-	
+
 	// procurar pela plataforma se é ps4, ps5...
 
 	@GetMapping("/plataforma/{plataforma}")
@@ -58,36 +63,35 @@ public class ProdutoController {
 	}
 
 	// filtar por preco menor que
-	
+
 	@GetMapping("/precomenorque/{preco}")
 	public ResponseEntity<List<Produto>> findByPrecoMenorQue(@PathVariable Double preco) {
 		return ResponseEntity.ok(produtoRepository.findByPrecoLessThanEqual(preco));
 	}
 
-	
 	// filtar por preco maior que
-	
+
 	@GetMapping("/precomaiorque/{preco}")
 	public ResponseEntity<List<Produto>> findByPrecoMaiorQue(@PathVariable Double preco) {
 		return ResponseEntity.ok(produtoRepository.findByPrecoGreaterThanEqual(preco));
 	}
 
 	// filtrar por intervalo de preços
-	
+
 	@GetMapping("/preco_inicial/{inicio}/preco_final/{fim}")
 	public ResponseEntity<List<Produto>> getByPrecoIntervalo(@PathVariable Double inicio, @PathVariable Double fim) {
 		return ResponseEntity.ok(produtoRepository.findByPrecoBetween(inicio, fim));
 	}
 
 	// verificar produtos disponiveis para compra
-	
+
 	@GetMapping("/disponiveis")
 	public ResponseEntity<List<Produto>> getByProdutoDisponivel() {
 		return ResponseEntity.ok(produtoRepository.findByDispTrue());
 	}
 
 	// ver produtos indisponiveis no momento
-	
+
 	@GetMapping("/indisponiveis")
 	public ResponseEntity<List<Produto>> getByProdutoIndisponivel() {
 		return ResponseEntity.ok(produtoRepository.findByDispFalse());
@@ -95,17 +99,28 @@ public class ProdutoController {
 
 	@PostMapping
 	public ResponseEntity<Produto> postProduto(@Valid @RequestBody Produto produto) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(produtoRepository.save(produto));
+		if (usuarioRepository.existsById(produto.getUsuario().getId())) {
+
+			if (categoriaRepository.existsById(produto.getCategoria().getId())) {
+				return ResponseEntity.ok(produtoRepository.save(produto));
+			}
+
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe!!", null);
+
+		}
+
+		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario não existe!!", null);
 	}
 
 	@PutMapping
 	public ResponseEntity<Produto> putProduto(@Valid @RequestBody Produto produto) {
-		if (produtoRepository.existsById(produto.getId())) {
-			return categoriaRepository.findById(produto.getCategoria().getId())
+		if (categoriaRepository.existsById(produto.getCategoria().getId())
+				&& usuarioRepository.existsById(produto.getUsuario().getId())) {
+			return produtoRepository.findById(produto.getId())
 					.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(produtoRepository.save(produto)))
-					.orElse(ResponseEntity.badRequest().build());
+					.orElse(ResponseEntity.notFound().build());
 		}
-		return ResponseEntity.notFound().build();
+		return ResponseEntity.badRequest().build();
 	}
 
 	@DeleteMapping("/{id}")

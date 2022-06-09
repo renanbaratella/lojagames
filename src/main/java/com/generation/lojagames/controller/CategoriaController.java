@@ -33,11 +33,26 @@ public class CategoriaController {
 		return ResponseEntity.ok(categoriaRepository.findAll());
 	}
 
+//	@GetMapping("/{id}")
+//	public ResponseEntity<Categoria> getById(@PathVariable Long id) {
+//		return categoriaRepository.findById(id)
+//				.map(resposta -> ResponseEntity.ok(resposta))
+//				.orElse(ResponseEntity.notFound().build());
+//	}
+	
 	@GetMapping("/{id}")
 	public ResponseEntity<Categoria> getById(@PathVariable Long id) {
-		return categoriaRepository.findById(id).map(resposta -> ResponseEntity.ok(resposta))
+		return categoriaRepository.findById(id)
+				.map(resposta -> ResponseEntity.ok(resposta))
 				.orElse(ResponseEntity.notFound().build());
 	}
+	
+//	@GetMapping("/{id}")
+//	public ResponseEntity<Categoria> getById(@PathVariable Long id) {
+//		if (categoriaRepository.procurarCategoriaPorId(id) != null)
+//			return ResponseEntity.ok().body(categoriaRepository.procurarCategoriaPorId(id));
+//		return ResponseEntity.notFound().build();
+//	}
 
 	@GetMapping("/tipo/{tipo}")
 	public ResponseEntity<List<Categoria>> getBytipo(@PathVariable String tipo) {

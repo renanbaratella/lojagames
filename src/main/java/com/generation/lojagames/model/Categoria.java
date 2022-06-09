@@ -22,6 +22,7 @@ public class Categoria {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	@JsonIgnoreProperties("categoria")
 	@NotNull(message = "O atributo é obrigatório")
 	@NotBlank(message = "O atributo não deve conter espaços em branco")
